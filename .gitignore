@@ -1,5 +1,7 @@
 # Ignore virtual environment folder
 .venv/
+backend/serviceAccountKey.json
+
 
 # Ignore environment variables file
 .env
