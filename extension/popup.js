@@ -23,5 +23,15 @@ document.getElementById('savePreferences').addEventListener('click', () => {
         blurIntensity: blurIntensity 
     }, () => {
         console.log('Preferences saved!');
+
+        // Reload the active tab
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+                chrome.tabs.reload(tabs[0].id);
+            }
+        });
+
+        // Close the popup after saving
+        window.close();
     });
 });

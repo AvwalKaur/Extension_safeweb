@@ -6,3 +6,4 @@ transformers
 spacy
 firebase-admin
 python-dotenv
+detoxify

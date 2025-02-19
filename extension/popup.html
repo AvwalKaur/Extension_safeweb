@@ -5,50 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toxicity Filter</title>
     <style>
-        body {
-            width: 250px;
-            font-family: Arial, sans-serif;
-            padding: 10px;
+        :root {
+            --primary-color: #7da6e4;  /* Your preferred hex color */
+            --background-color: #1e1e2e;
+            --text-color: #ffffff;
+            --button-hover: #5c85c6;
+            --border-radius: 12px;
         }
+
+        body {
+            width: 300px;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+            text-align: center;
+            background: var(--background-color);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+        }
+
         h2 {
             margin-top: 0;
             font-size: 18px;
+            font-weight: 600;
         }
+
         label {
             font-size: 14px;
             display: block;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-weight: 500;
         }
+
         select, input[type="range"], input[type="checkbox"] {
             width: 100%;
             margin-top: 5px;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: none;
+            background: #2c2c3a;
+            color: var(--text-color);
         }
+
         input[type="range"] {
-            margin-top: 10px;
+            accent-color: var(--primary-color);
         }
+
         .preference-container {
             margin-top: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border: none;
+            background: var(--primary-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+        }
+
+        .links {
+            margin-top: 15px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            color: var(--primary-color);
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .links a:hover {
+            color: var(--button-hover);
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h2>Toxicity Filter Preferences</h2>
+    <h2>🚀 Toxicity Filter</h2>
 
-    <label for="sensitivity">Sensitivity Level:</label>
-    <select id="sensitivity" name="sensitivity">
+    <label for="sensitivity">⚙️ Sensitivity Level:</label>
+    <select id="sensitivity">
         <option value="high">High</option>
         <option value="medium" selected>Medium</option>
         <option value="low">Low</option>
     </select>
 
-    <label for="enableBlur">Enable Blur:</label>
+    <label for="enableBlur">🔍 Enable Blur:</label>
     <input type="checkbox" id="enableBlur" checked>
 
-    <label for="blurIntensity">Blur Intensity:</label>
+    <label for="blurIntensity">🌫️ Blur Intensity:</label>
     <input type="range" id="blurIntensity" min="0" max="15" value="10" step="1">
 
     <div class="preference-container">
-        <button id="savePreferences">Save Preferences</button>
+        <button id="savePreferences">💾 Save Preferences</button>
+    </div>
+
+    <div class="links">
+        <a href="more_info.html" target="_blank">💡 Get to Know More</a> |
+        <a href="http://127.0.0.1:5000/" target="_blank">🌐 Go to Site</a>
     </div>
 
     <script src="popup.js"></script>

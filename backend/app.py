@@ -11,14 +11,20 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# ✅ Firebase Initialization with Exception Handling
-try:
-    cred = credentials.Certificate("firebase_config.json")
-    firebase_admin.initialize_app(cred)
+cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+# ✅ Prevent Firebase from initializing multiple times
+if not firebase_admin._apps:
+    if cred_path:
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
+    else:
+        print("⚠️ Firebase credentials not found!")
+
+# ✅ Firestore Database Initialization
+db = None
+if firebase_admin._apps:
     db = firestore.client()
-except Exception as e:
-    print(f"🔥 Firebase Initialization Error: {e}")
-    db = None  # Prevent crashes
 
 # ✅ Import Toxicity Model with Fallback
 try:
