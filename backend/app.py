@@ -1,31 +1,39 @@
 from flask import Flask, request, jsonify
-from model import detect_toxicity  
+from send_email import send_email_alert  
 import firebase_admin
 from firebase_admin import credentials, firestore
-from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 
-
 load_dotenv()
-
 
 app = Flask(__name__)
 CORS(app)
 
+# ✅ Firebase Initialization with Exception Handling
+try:
+    cred = credentials.Certificate("firebase_config.json")
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+except Exception as e:
+    print(f"🔥 Firebase Initialization Error: {e}")
+    db = None  # Prevent crashes
 
-# Firebase starting
-cred = credentials.Certificate("firebase_config.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# ✅ Import Toxicity Model with Fallback
+try:
+    from model import detect_toxicity
+except ImportError as e:
+    print(f"⚠️ Model import failed: {e}")
+    detect_toxicity = lambda text: 0.0  # Return 0.0 (non-toxic) if model fails
 
-# Twilio Credentials 
-TWILIO_SID = os.getenv("TWILIO_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "+15802049375")
-ADMIN_PHONE_NUMBER = os.getenv("ADMIN_PHONE_NUMBER", "+918130035736")
-client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
+# ✅ Load Email Configuration
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+
+if not EMAIL_ADDRESS or not EMAIL_PASSWORD or not ADMIN_EMAIL:
+    print("⚠️ Missing email environment variables. Check your .env file.")
 
 @app.route("/", methods=["GET"])
 def home():
@@ -39,37 +47,20 @@ def analyze_text():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
-    #  Detoxify's toxicity detecttion 
+    # ✅ Run toxicity analysis
     toxicity_score = detect_toxicity(text)
 
-    # saving flagged messages in Firebase if highly toxic
-    if toxicity_score >= 0.8:  
+    # ✅ Store highly toxic messages in Firebase
+    if toxicity_score >= 0.8 and db:  
         db.collection("toxic_messages").add({
             "text": text,
             "score": float(toxicity_score)
         })
 
-        # send SMS alert
-        client.messages.create(
-            body=f"🚨 Toxic Speech Alert: {text}",
-            from_=TWILIO_PHONE_NUMBER,
-            to=ADMIN_PHONE_NUMBER
-        )
+        # ✅ Send email alert
+        send_email_alert(text)
 
     return jsonify({"toxicity_score": float(toxicity_score)})
 
-@app.route("/alert", methods=["POST"])
-def send_alert():
-    data = request.json
-    phone_number = data.get("phone_number", ADMIN_PHONE_NUMBER)
-
-    client.messages.create(
-        body="🚨 Toxic Content Detected!",
-        from_=TWILIO_PHONE_NUMBER,
-        to=ADMIN_PHONE_NUMBER
-    )
-
-    return jsonify({"message": "Alert Sent"}), 200
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=os.getenv("DEBUG", "False").lower() == "true")

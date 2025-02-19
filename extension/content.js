@@ -32,22 +32,38 @@ const sensitivityLevels = {
     high: 0.5
 };
 
-(async function () {
+// Function to scan and blur toxic content
+async function scanText(element) {
     const preferences = await getPreferences();
     const toxicityThreshold = sensitivityLevels[preferences.toxicityThreshold] || 0.7;
     const enableBlur = preferences.enableBlur;
     const blurIntensity = preferences.blurIntensity;
 
-    // Scan and blur toxic content
-    document.querySelectorAll("p").forEach(async (element) => {
-        const text = element.innerText;
-        const toxicity = await analyzeText(text);
+    const text = element.innerText;
+    const toxicity = await analyzeText(text);
 
-        if (toxicity >= toxicityThreshold) {
-            if (enableBlur) {
-                element.style.filter = `blur(${blurIntensity}px)`;
-            }
-            element.title = "⚠️ Warning: Content hidden due to toxicity!";
+    if (toxicity >= toxicityThreshold) {
+        if (enableBlur) {
+            element.style.filter = `blur(${blurIntensity}px)`;
         }
-    });
-})();
+        element.title = "Warning: Content hidden due to toxicity!";
+    }
+}
+
+// Observe the page for new elements
+const observer = new MutationObserver(async (mutations) => {
+    for (let mutation of mutations) {
+        if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    node.querySelectorAll("p").forEach(scanText);
+                }
+            });
+        }
+    }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Scan existing text when script runs
+document.querySelectorAll("p").forEach(scanText);
