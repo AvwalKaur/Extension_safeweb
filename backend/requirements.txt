@@ -1,0 +1,9 @@
+Flask
+Flask-CORS
+requests
+tensorflow
+transformers
+spacy
+firebase-admin
+twilio
+python-dotenv

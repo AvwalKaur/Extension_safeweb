@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxicity Filter</title>
+    <style>
+        body {
+            width: 250px;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        label {
+            font-size: 14px;
+            display: block;
+            margin-top: 10px;
+        }
+        select, input[type="range"], input[type="checkbox"] {
+            width: 100%;
+            margin-top: 5px;
+        }
+        input[type="range"] {
+            margin-top: 10px;
+        }
+        .preference-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Toxicity Filter Preferences</h2>
+
+    <label for="sensitivity">Sensitivity Level:</label>
+    <select id="sensitivity" name="sensitivity">
+        <option value="high">High</option>
+        <option value="medium" selected>Medium</option>
+        <option value="low">Low</option>
+    </select>
+
+    <label for="enableBlur">Enable Blur:</label>
+    <input type="checkbox" id="enableBlur" checked>
+
+    <label for="blurIntensity">Blur Intensity:</label>
+    <input type="range" id="blurIntensity" min="0" max="15" value="10" step="1">
+
+    <div class="preference-container">
+        <button id="savePreferences">Save Preferences</button>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
